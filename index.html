@@ -1,0 +1,42 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Loan Interest Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+</head>
+<body>
+
+<h2>Loan Interest Tracker</h2>
+
+<!-- NAVIGATION -->
+<nav class="nav">
+  <button onclick="showPage('dashboard')">Dashboard</button>
+  <button onclick="showPage('add')">Add Loan</button>
+  <button onclick="showPage('loans')">All Loans</button>
+</nav>
+
+<!-- DASHBOARD -->
+<section id="dashboardPage"></section>
+
+<!-- ADD / EDIT LOAN -->
+<section id="addPage" style="display:none;">
+  <h3>Add / Edit Loan</h3>
+  <form id="loanForm">
+    <input id="borrowerName" placeholder="Borrower Name" required />
+    <input id="loanAmount" type="number" placeholder="Loan Amount" required />
+    <input id="monthlyInterest" type="number" placeholder="Monthly Interest (₹)" required />
+    <input id="startDate" type="date" required />
+    <button type="submit">Save Loan</button>
+  </form>
+</section>
+
+<!-- ALL LOANS -->
+<section id="loansPage" style="display:none;"></section>
+
+<script src="app.js"></script>
+</body>
+</html>
