@@ -1,9 +1,15 @@
+/*********************************
+ * STATE
+ *********************************/
 let loans = JSON.parse(localStorage.getItem("loans")) || [];
 let editId = null;
 
-// DOM
+/*********************************
+ * DOM
+ *********************************/
 const dashboardPage = document.getElementById("dashboardPage");
 const loansPage = document.getElementById("loansPage");
+const addPage = document.getElementById("addPage");
 const form = document.getElementById("loanForm");
 
 const borrowerNameInput = document.getElementById("borrowerName");
@@ -11,11 +17,13 @@ const loanAmountInput = document.getElementById("loanAmount");
 const interestInput = document.getElementById("monthlyInterest");
 const startDateInput = document.getElementById("startDate");
 
-// NAVIGATION
+/*********************************
+ * NAVIGATION
+ *********************************/
 function showPage(page) {
   dashboardPage.style.display = "none";
-  document.getElementById("addPage").style.display = "none";
   loansPage.style.display = "none";
+  addPage.style.display = "none";
 
   if (page === "dashboard") renderDashboard();
   if (page === "loans") renderAllLoans();
@@ -25,13 +33,17 @@ function showPage(page) {
 
 showPage("dashboard");
 
-// SAVE
+/*********************************
+ * STORAGE
+ *********************************/
 function save() {
   localStorage.setItem("loans", JSON.stringify(loans));
   showPage("dashboard");
 }
 
-// FORM SUBMIT
+/*********************************
+ * FORM SUBMIT
+ *********************************/
 form.addEventListener("submit", e => {
   e.preventDefault();
 
@@ -48,7 +60,7 @@ form.addEventListener("submit", e => {
   };
 
   if (editId) {
-    loans = loans.map(l => l.id === editId ? loan : l);
+    loans = loans.map(l => (l.id === editId ? loan : l));
     editId = null;
   } else {
     loans.push(loan);
@@ -58,75 +70,137 @@ form.addEventListener("submit", e => {
   save();
 });
 
-// HELPERS
+/*********************************
+ * DATE HELPERS
+ *********************************/
 function monthKey(date) {
   return `${date.getFullYear()}-${date.getMonth()}`;
 }
 
-function firstDueDate(loan) {
-  const d = new Date(loan.startDate);
-  d.setMonth(d.getMonth() + 1);
-  d.setDate(loan.dueDay);
-  return d;
+/* 🔥 CRITICAL FIX: SAFE DUE DATE */
+function getSafeDueDate(year, month, dueDay) {
+  const lastDay = new Date(year, month + 1, 0).getDate();
+  const safeDay = Math.min(dueDay, lastDay);
+  return new Date(year, month, safeDay);
 }
 
-// DASHBOARD
+/*********************************
+ * STATUS HELPER
+ *********************************/
+function getLoanStatus(loan) {
+  const today = new Date();
+  const currentMonthKey = monthKey(today);
+
+  const dueDate = getSafeDueDate(
+    today.getFullYear(),
+    today.getMonth(),
+    loan.dueDay
+  );
+
+  if (loan.lastCollectedMonth === currentMonthKey) {
+    return "collected";
+  }
+
+  if (today < dueDate) {
+    return "upcoming";
+  }
+
+  if (today.toDateString() === dueDate.toDateString()) {
+    return "pending";
+  }
+
+  return "overdue";
+}
+
+/*********************************
+ * DASHBOARD
+ *********************************/
 function renderDashboard() {
   dashboardPage.innerHTML = "<h3>Dashboard</h3>";
-  const today = new Date();
-  const currentMonth = monthKey(today);
 
-  let pending = [];
-  let upcoming = [];
+  let actionLoans = [];
+  let upcomingLoans = [];
 
   loans.forEach(loan => {
-    const due = firstDueDate(loan);
+    const status = getLoanStatus(loan);
+    const dueDate = getSafeDueDate(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      loan.dueDay
+    );
 
-    if (today >= due && loan.lastCollectedMonth !== currentMonth) {
-      pending.push(loan);
-    } else {
-      upcoming.push({ loan, due });
+    if (status === "pending" || status === "overdue") {
+      actionLoans.push({ loan, status });
+    }
+
+    if (status === "upcoming") {
+      upcomingLoans.push({ loan, dueDate });
     }
   });
 
-  if (!pending.length && !upcoming.length) {
+  if (!actionLoans.length && !upcomingLoans.length) {
     dashboardPage.innerHTML += "<p>✅ No reminders</p>";
     return;
   }
 
-  if (pending.length) {
-    dashboardPage.innerHTML += "<h4>🔴 Pending</h4>";
-    pending.forEach(l => dashboardPage.innerHTML += dashboardCard(l, "pending"));
+  if (actionLoans.length) {
+    dashboardPage.innerHTML += "<h4>⚠️ Action Required</h4>";
+    actionLoans.forEach(({ loan, status }) => {
+      dashboardPage.innerHTML += dashboardCard(loan, status);
+    });
   }
 
-  if (upcoming.length) {
+  if (upcomingLoans.length) {
     dashboardPage.innerHTML += "<h4>🕒 Upcoming</h4>";
-    upcoming.forEach(({ loan, due }) =>
+    upcomingLoans.forEach(({ loan, dueDate }) => {
       dashboardPage.innerHTML += `
         <div class="loan-card upcoming">
-          ${loan.name} – ₹${loan.interest}<br>
-          Due on ${due.toDateString()}
-        </div>`
-    );
+          <strong>${loan.name}</strong><br>
+          ₹${loan.interest}<br>
+          Due on ${dueDate.toDateString()}
+        </div>
+      `;
+    });
   }
 }
 
-// DASHBOARD CARD
-function dashboardCard(loan) {
-  return `
-    <div class="loan-card pending">
-      ${loan.name} – ₹${loan.interest}<br><br>
-      <button onclick="collect(${loan.id})">Collected</button>
-    </div>
-  `;
+/*********************************
+ * DASHBOARD CARD
+ *********************************/
+function dashboardCard(loan, status) {
+  const label =
+    status === "overdue" ? "⚠️ Overdue" : "🔴 Pending";
+
+  const cardClass =
+    status === "overdue"
+      ? "loan-card overdue"
+      : "loan-card pending";
+
+return `
+  <div class="${cardClass}">
+    <strong>${loan.name}</strong>
+    <span style="font-size:17px;color:#6b7280;">
+      (₹${loan.amount.toLocaleString()})
+    </span><br>
+
+    ₹${loan.interest}<br>
+    <span>${label}</span><br><br>
+
+    <button onclick="collect(${loan.id})">Collected</button>
+  </div>
+`;
 }
 
-// ACTIONS
+/*********************************
+ * ACTIONS
+ *********************************/
 function collect(id) {
   const m = monthKey(new Date());
+
   loans = loans.map(l =>
     l.id === id ? { ...l, lastCollectedMonth: m } : l
   );
+
   save();
 }
 
@@ -148,16 +222,21 @@ function deleteLoan(id) {
   save();
 }
 
-// ALL LOANS
+/*********************************
+ * ALL LOANS PAGE
+ *********************************/
 function renderAllLoans() {
   loansPage.innerHTML = "<h3>All Loans</h3>";
 
   loans.forEach(l => {
+    const status = getLoanStatus(l);
+
     loansPage.innerHTML += `
-      <div class="loan-card">
+      <div class="loan-card ${status}">
         <strong>${l.name}</strong><br>
         Amount: ₹${l.amount}<br>
         Interest: ₹${l.interest}<br>
+        Status: ${status}<br><br>
         <button onclick="editLoan(${l.id})">Edit</button>
         <button onclick="deleteLoan(${l.id})">Delete</button>
       </div>
@@ -165,13 +244,11 @@ function renderAllLoans() {
   });
 }
 
-
-
-//backup 
-
+/*********************************
+ * BACKUP
+ *********************************/
 function exportBackup() {
   const data = localStorage.getItem("loans");
-
   if (!data) {
     alert("No data to backup");
     return;
@@ -188,16 +265,11 @@ function exportBackup() {
   URL.revokeObjectURL(url);
 }
 
-
-
-//import
-
 function importBackup(event) {
   const file = event.target.files[0];
   if (!file) return;
 
   const reader = new FileReader();
-
   reader.onload = e => {
     try {
       const data = JSON.parse(e.target.result);
@@ -208,13 +280,12 @@ function importBackup(event) {
       alert("Invalid backup file");
     }
   };
-
   reader.readAsText(file);
 }
 
-
-
-//service layer
+/*********************************
+ * SERVICE WORKER
+ *********************************/
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./service-worker.js");
 }

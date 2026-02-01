@@ -1,44 +1,163 @@
+:root {
+  --primary: #2563eb;
+  --danger: #dc2626;
+  --warning: #f59e0b;
+  --success: #16a34a;
+  --bg: #f8fafc;
+  --card: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
 
 body {
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
-  padding: 15px;
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: #111827;
 }
 
+/* HEADER */
 h2 {
   text-align: center;
+  padding: 12px;
+  margin: 0;
+  background: var(--primary);
+  color: white;
 }
 
+/* NAV */
 .nav {
   display: flex;
   justify-content: space-around;
-  margin-bottom: 15px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .nav button {
-  padding: 10px;
+  flex: 1;
+  padding: 12px;
   border: none;
-  background: #2196f3;
-  color: white;
-  border-radius: 5px;
+  background: none;
+  font-weight: 600;
+  color: #374151;
 }
 
+.nav button:hover {
+  background: #f1f5f9;
+}
+
+/* PAGE */
 section {
-  margin-top: 10px;
+  padding: 12px;
 }
 
-input, button {
-  width: 100%;
-  padding: 10px;
-  margin: 5px 0;
-}
-
-.loan-card {
+/* FORM */
+form {
   background: white;
+  padding: 14px;
+  border-radius: 10px;
+}
+
+input {
+  width: 100%;
   padding: 12px;
   margin-bottom: 10px;
-  border-radius: 6px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
 }
 
-.pending { border-left: 5px solid red; }
-.upcoming { border-left: 5px solid orange; }
+/* BUTTONS */
+button {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+
+.btn-success {
+  background: var(--success);
+  color: white;
+}
+
+/* LOAN CARD */
+.loan-card {
+  background: var(--card);
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* STATUS COLORS */
+.pending {
+  border-left: 6px solid var(--danger);
+}
+
+.overdue {
+  border-left: 6px solid var(--warning);
+  background: #fff7ed;
+}
+
+.upcoming {
+  border-left: 6px solid #94a3b8;
+}
+
+.collected {
+  border-left: 6px solid var(--success);
+  opacity: 0.8;
+}
+
+/* STATUS BADGE */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge.pending { background: #fee2e2; color: #991b1b; }
+.badge.overdue { background: #ffedd5; color: #9a3412; }
+.badge.upcoming { background: #e5e7eb; color: #374151; }
+.badge.collected { background: #dcfce7; color: #166534; }
+
+
+@media (min-width: 768px) {
+  body {
+    max-width: 480px;
+    margin: auto;
+    border-left: 1px solid #e5e7eb;
+    border-right: 1px solid #e5e7eb;
+  }
+
+  .nav button {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  h2 {
+    font-size: 18px;
+  }
+
+  .loan-card {
+    padding: 12px;
+  }
+
+  button {
+    font-size: 14px;
+  }
+}
