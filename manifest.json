@@ -1,12 +1,21 @@
 {
-   "name": "Loan Interest Tracker",
+  "name": "Loan Interest Tracker",
   "short_name": "LoanTracker",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#2196f3"
-
+  "theme_color": "#2196f3",
+  "icons": [
+    {
+      "src": "icons/loan-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/loan-icon-2.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
-
-
