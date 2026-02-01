@@ -164,3 +164,50 @@ function renderAllLoans() {
     `;
   });
 }
+
+
+
+//backup 
+
+function exportBackup() {
+  const data = localStorage.getItem("loans");
+
+  if (!data) {
+    alert("No data to backup");
+    return;
+  }
+
+  const blob = new Blob([data], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "loan-backup.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+
+
+//import
+
+function importBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      localStorage.setItem("loans", JSON.stringify(data));
+      alert("Backup restored successfully");
+      location.reload();
+    } catch {
+      alert("Invalid backup file");
+    }
+  };
+
+  reader.readAsText(file);
+}
