@@ -14,18 +14,26 @@
 }
 
 /*********************************
-  RESET & BASE
+  RESET & SAFETY
 *********************************/
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
 }
 
-html, body {
+html {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg);
   color: var(--text);
@@ -33,9 +41,12 @@ html, body {
 }
 
 /*********************************
-  APP LAYOUT
+  APP CONTAINER (IMPORTANT)
 *********************************/
-body {
+.app {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg);
   display: flex;
   flex-direction: column;
 }
@@ -46,11 +57,15 @@ body {
 h2 {
   margin: 0;
   padding: 14px 12px;
+  width: 100%;
   text-align: center;
   background: var(--primary);
   color: #fff;
   font-size: 18px;
   font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 /*********************************
@@ -78,7 +93,7 @@ h2 {
 }
 
 /*********************************
-  PAGE SECTIONS
+  SECTIONS
 *********************************/
 section {
   width: 100%;
@@ -95,13 +110,13 @@ form {
   border-radius: 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 input {
   width: 100%;
   padding: 12px;
-  font-size: 16px; /* 🔑 prevents mobile zoom */
+  font-size: 16px; /* prevents mobile zoom */
   border-radius: 10px;
   border: 1px solid var(--border);
   outline: none;
@@ -147,11 +162,11 @@ button {
   padding: 14px;
   border-radius: 16px;
   margin-bottom: 12px;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
 }
 
 /*********************************
-  STATUS COLORS
+  STATUS STATES
 *********************************/
 .loan-card.pending {
   border-left: 6px solid var(--danger);
@@ -172,7 +187,7 @@ button {
 }
 
 /*********************************
-  CARD CONTENT HELPERS
+  CARD HELPERS
 *********************************/
 .loan-card strong {
   font-size: 16px;
@@ -190,7 +205,7 @@ button {
 }
 
 /*********************************
-  BADGES (OPTIONAL)
+  BADGES
 *********************************/
 .badge {
   display: inline-block;
@@ -206,14 +221,18 @@ button {
 .badge.collected { background: #dcfce7; color: #166534; }
 
 /*********************************
-  DESKTOP ONLY (CENTERED VIEW)
+  DESKTOP ENHANCEMENT ONLY
 *********************************/
 @media (min-width: 768px) {
   body {
+    background: #e5e7eb;
+  }
+
+  .app {
     max-width: 420px;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto;
     border-left: 1px solid var(--border);
     border-right: 1px solid var(--border);
+    min-height: 100vh;
   }
 }
