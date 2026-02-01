@@ -1,4 +1,4 @@
-const CACHE_NAME = "loan-tracker-v1";
+const CACHE_NAME = "loan-tracker-v2";
 const BASE_PATH = "/Loan-Tracker/";
 
 const ASSETS = [
